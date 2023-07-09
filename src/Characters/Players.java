@@ -2,10 +2,9 @@ package Characters;
 
 import Characters.Actions.Fighting;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
+import javax.swing.plaf.IconUIResource;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -143,7 +142,7 @@ public class Players implements Fighting {
     }
 
 
-    public static int enterNum(int low, int up) {
+    private static int enterNum(int low, int up) {
         Scanner scanner = new Scanner(System.in);
         String strLine;
         do {
@@ -160,8 +159,6 @@ public class Players implements Fighting {
             }
             return Integer.parseInt(strLine);
         } while (true);
-
-
     }
 
     private static void checkStats(Players player) {
@@ -218,6 +215,7 @@ public class Players implements Fighting {
         System.out.printf("Сила = %d, Ловкость = %d, Доступно очков = %d:\n",
                 this.getStrength(), this.getAgility(), newPoints);
         this.newPoints = 0;
+        checkStats(this);
     }
 
     private boolean isDodge() {
@@ -269,6 +267,46 @@ public class Players implements Fighting {
         }
         return this.healthPoint > 0;
     }
+
+    public void buySomething() {
+        NpsTraders shop = new NpsTraders(this);
+        String item;
+        String itemName;
+        int itemQnt;
+        int itemPrice;
+
+        do {
+            System.out.printf("Сила = %d, Ловкость = %d, Здоровье = %d, Золото = %d:\n",
+                    this.getStrength(), this.getAgility(), this.getHealthPoint(), this.getGold());
+            item = shop.buyedItem();
+            itemName = item.split(",")[0];
+            itemQnt = Integer.parseInt(item.split(",")[1]);
+            itemPrice = Integer.parseInt(item.split(",")[2]);
+
+            if (itemName.equals("strength")) {
+                this.strength += itemQnt;
+                this.gold-=itemPrice;
+                System.out.println("Зелье силы выпито.\n");
+            }
+            if (itemName.equals("agility")) {
+                this.agility += itemQnt;
+                this.gold-=itemPrice;
+                System.out.println("Зелье ловкости выпито.\n");
+            }
+            if (itemName.equals("health")) {
+                this.healthPoint += itemQnt;
+                this.gold-=itemPrice;
+                System.out.println("Зелье лечения выпито.\n");
+            }
+            if (itemName.equals("exit")) {
+                System.out.println("Выходим из магазина.\n");
+            }
+        } while (!itemName.equals("exit"));
+
+        System.out.printf("Сила = %d, Ловкость = %d, Здоровье = %d, Золото = %d:\n",
+                this.getStrength(), this.getAgility(), this.getHealthPoint(), this.getGold());
+    }
+
 
     @Override
     public String toString() {

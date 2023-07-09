@@ -1,8 +1,8 @@
 package Characters;
 
 public class Battle {
-    private Players playerRival;
-    private NpcMonsters monsterRival;
+    private final Players playerRival;
+    private final NpcMonsters monsterRival;
 
     public Battle(Players playerRival, NpcMonsters monsterRival) {
         this.playerRival = playerRival;
