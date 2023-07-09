@@ -2,9 +2,10 @@ package Characters;
 
 import Characters.Actions.Fighting;
 
-import javax.swing.plaf.IconUIResource;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,9 +26,11 @@ public class Players implements Fighting {
     private static int totalPlayers = 0;
     private static List<Players> playersList = new ArrayList<>();
     private String name;
-    private int healthPoint;
     private int strength;
     private int agility;
+    private int maxHealth ;
+    private int healthPoint;
+
     private int gold;
     private int experience;
     private int currentLVL;
@@ -42,6 +45,10 @@ public class Players implements Fighting {
 
     public static List<Players> getPlayersList() {
         return playersList;
+    }
+
+    public int getMaxHealth() {
+        return maxHealth;
     }
 
     public String getName() {
@@ -78,9 +85,10 @@ public class Players implements Fighting {
 
     private Players(String name) {
         this.name = name;
-        this.healthPoint = 100;
         this.strength = 3;
         this.agility = 3;
+        this.maxHealth = this.strength * 20;
+        this.healthPoint = this.maxHealth;
         this.gold = 10;
         this.currentLVL = 1;
         this.experience = 1;
@@ -92,10 +100,11 @@ public class Players implements Fighting {
 
     public Players() {
         this.name = "Valera";
-        this.healthPoint = 100;
         this.strength = 5;
         this.agility = 5;
-        this.gold = 10;
+        this.maxHealth = this.strength * 20;
+        this.healthPoint = 70;
+        this.gold = 1000;
         this.currentLVL = 1;
         this.experience = 1;
         this.newPoints = 0;
@@ -121,22 +130,22 @@ public class Players implements Fighting {
     private static void createName(Players newPlayer) {
         Scanner console = new Scanner(System.in);
         System.out.println("Введите имя персонажа:");
-        String wrongSymbols;
+        StringBuilder wrongSymbols;
         String correctName;
         do {
-            wrongSymbols = "";
+            wrongSymbols = new StringBuilder();
             correctName = console.nextLine();
             String text = correctName;
 
             Pattern pattern = Pattern.compile("[^\\s[a-zA-Z]]");
             Matcher matcher = pattern.matcher(text);
             while (matcher.find()) {
-                wrongSymbols += text.substring(matcher.start(), matcher.end());
+                wrongSymbols.append(text, matcher.start(), matcher.end());
             }
-            if (!wrongSymbols.equals("")) {
+            if (!"".equals(wrongSymbols.toString())) {
                 System.out.println("Не правильное имя персонажа, попробуйте снова:");
             }
-        } while (!wrongSymbols.equals(""));
+        } while (!wrongSymbols.toString().equals(""));
         System.out.println("Отлично. Имя вашего персонажа: " + correctName);
         newPlayer.name = correctName;
     }
@@ -147,13 +156,13 @@ public class Players implements Fighting {
         String strLine;
         do {
             strLine = scanner.nextLine();
-            String wrongSymbols = "";
-            Pattern pattern = Pattern.compile("[[^\\d]\\s]");
+            StringBuilder wrongSymbols = new StringBuilder();
+            Pattern pattern = Pattern.compile("[\\D\\s]");
             Matcher matcher = pattern.matcher(strLine);
             while (matcher.find()) {
-                wrongSymbols += strLine.substring(matcher.start(), matcher.end());
+                wrongSymbols.append(strLine, matcher.start(), matcher.end());
             }
-            if (!wrongSymbols.equals("") || Integer.parseInt(strLine) > up || Integer.parseInt(strLine) < low) {
+            if (!wrongSymbols.toString().equals("") || Integer.parseInt(strLine) > up || Integer.parseInt(strLine) < low) {
                 System.out.println("Не веррный ввод:");
                 continue;
             }
@@ -161,8 +170,11 @@ public class Players implements Fighting {
         } while (true);
     }
 
-    private static void checkStats(Players player) {
-        player.healthPoint = player.strength * 20;
+    private void checkStats() {
+        if (this.maxHealth < this.strength * 20) {
+            this.maxHealth = this.strength * 20;
+            this.healthPoint += (this.strength * 20 - this.maxHealth);
+        }
     }
 
 
@@ -192,7 +204,6 @@ public class Players implements Fighting {
     }
 
     public void distributeAbilities() {
-        Scanner scanner = new Scanner(System.in);
         int enterNumber;
         System.out.println("Распределите очки");
         do {
@@ -215,7 +226,7 @@ public class Players implements Fighting {
         System.out.printf("Сила = %d, Ловкость = %d, Доступно очков = %d:\n",
                 this.getStrength(), this.getAgility(), newPoints);
         this.newPoints = 0;
-        checkStats(this);
+        this.checkStats();
     }
 
     private boolean isDodge() {
@@ -285,17 +296,18 @@ public class Players implements Fighting {
 
             if (itemName.equals("strength")) {
                 this.strength += itemQnt;
-                this.gold-=itemPrice;
+                this.gold -= itemPrice;
+                this.checkStats();
                 System.out.println("Зелье силы выпито.\n");
             }
             if (itemName.equals("agility")) {
                 this.agility += itemQnt;
-                this.gold-=itemPrice;
+                this.gold -= itemPrice;
                 System.out.println("Зелье ловкости выпито.\n");
             }
             if (itemName.equals("health")) {
-                this.healthPoint += itemQnt;
-                this.gold-=itemPrice;
+                this.healthPoint = Math.min((this.healthPoint + itemQnt), this.maxHealth);
+                this.gold -= itemPrice;
                 System.out.println("Зелье лечения выпито.\n");
             }
             if (itemName.equals("exit")) {
@@ -312,12 +324,15 @@ public class Players implements Fighting {
     public String toString() {
         return "Players{" +
                 "name='" + name + '\'' +
-                ", healthPoint=" + healthPoint +
                 ", strength=" + strength +
                 ", agility=" + agility +
+                ", maxHealth=" + maxHealth +
+                ", healthPoint=" + healthPoint +
                 ", gold=" + gold +
                 ", experience=" + experience +
-                ", lvl=" + currentLVL +
+                ", currentLVL=" + currentLVL +
+                ", newPoints=" + newPoints +
+                ", isAlive=" + isAlive +
                 '}';
     }
 }

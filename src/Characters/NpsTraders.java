@@ -26,13 +26,13 @@ public class NpsTraders {
         String strLine;
         do {
             strLine = scanner.nextLine();
-            String wrongSymbols = "";
-            Pattern pattern = Pattern.compile("[[^\\d]\\s]");
+            StringBuilder wrongSymbols = new StringBuilder();
+            Pattern pattern = Pattern.compile("[\\D\\s]");
             Matcher matcher = pattern.matcher(strLine);
             while (matcher.find()) {
-                wrongSymbols += strLine.substring(matcher.start(), matcher.end());
+                wrongSymbols.append(strLine, matcher.start(), matcher.end());
             }
-            if (!wrongSymbols.equals("") || Integer.parseInt(strLine) > up || Integer.parseInt(strLine) < low) {
+            if (!wrongSymbols.toString().equals("") || Integer.parseInt(strLine) > up || Integer.parseInt(strLine) < low) {
                 System.out.println("Не веррный ввод:");
                 continue;
             }
@@ -46,28 +46,33 @@ public class NpsTraders {
 
     public String buyedItem() {
         String result = "";
-        System.out.println("Что хотите купить?");
-        this.printStockList();
-        Scanner scanner = new Scanner(System.in);
-        int enterNumber = enterNum(1, 4);
-        switch (enterNumber) {
-            case 1: {
-                result = "strength,1,50";
-                break;
+        do {
+            System.out.println("Что хотите купить?");
+            this.printStockList();
+            int enterNumber = enterNum(1, 4);
+            switch (enterNumber) {
+                case 1 -> {
+                    result = "strength,1,50";
+                }
+                case 2 -> {
+                    result = "agility,1,50";
+                }
+                case 3 -> {
+                    result = "health,60,60";
+                }
+                case 4 -> {
+                    result = "exit,0,0";
+                }
             }
-            case 2: {
-                result = "agility,1,50";
-                break;
+            if (Integer.parseInt(result.split(",")[2]) > buyer.getGold()) {
+                System.out.println("Недостаточно денег для покупки.\n");
+                result = "error";
             }
-            case 3: {
-                result = "health,60,60";
-                break;
+            if (result.split(",")[0].equals("health") && buyer.getMaxHealth() <= buyer.getHealthPoint()) {
+                System.out.println("Уже максимальное здоровье.\n");
+                result = "error";
             }
-            case 4: {
-                result = "exit,0,0";
-                break;
-            }
-        }
+        } while (result.equals("error"));
         return result;
     }
 
