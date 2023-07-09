@@ -32,4 +32,7 @@ public abstract class NpcMonsters implements Fighting {
     abstract public String toString();
 
     abstract public String getName();
+    abstract public int getGold();
+    abstract public int getExperience();
+
 }

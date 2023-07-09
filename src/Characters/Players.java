@@ -181,6 +181,19 @@ public class Players implements Fighting {
         }
     }
 
+    public void getAward(int exp, int gold) {
+        if (exp < 0) {
+            System.out.println("Получаемый опыт не может быть отрицательным. Вернули 0");
+            exp = 0;
+        }
+        if (gold < 0) {
+            System.out.println("Получаемое золото не может быть отрицательным. Вернули 0");
+            gold = 0;
+        }
+        this.experience += exp;
+        this.gold += gold;
+    }
+
     public void distributeAbilities() {
         Scanner scanner = new Scanner(System.in);
         int enterNumber;
@@ -207,33 +220,45 @@ public class Players implements Fighting {
         this.newPoints = 0;
     }
 
-
-    private double criticalChance() {
+    private boolean isDodge() {
         double base = 10;
-        double bonus = this.agility * 0.5;
-        return base + bonus;
+        double dodgeChance = base + this.agility;
+        Random rnd = new Random();
+        int rndNumber = rnd.nextInt(1000) + 1;
+        return (dodgeChance * 10) >= rndNumber;
+    }
+
+    private boolean isCriticalHit() {
+        double base = 10;
+        double critChance = base + this.agility * 0.5;
+        Random rnd = new Random();
+        int rndNumber = rnd.nextInt(1000) + 1;
+        return (critChance * 10) >= rndNumber;
     }
 
     private int attackPower() {
-        double critChance = this.criticalChance();
-        Random rnd = new Random();
-        int rndNumber = rnd.nextInt(1000) + 1;
-        int multi = (int) (critChance * 10) >= rndNumber ? 2 : 1;
-        return this.strength * multi;
+        boolean critHit = this.isCriticalHit();
+        double criticalDmg = ((this.strength * 0.05) + 2) * this.strength;
+        return critHit ? (int) Math.ceil(criticalDmg) : this.strength;
     }
 
     @Override
     public void attack(Fighting rival) {
         int attackPower = this.attackPower();
+        String critHit = attackPower > this.strength ? " Критический удар" : "";
         if (this.isAlive) {
-            System.out.printf("%s пытается атаковать противника силой: %d урона\n",this.name,attackPower);
+            System.out.printf("%s пытается атаковать противника силой: %d урона%s\n", this.name, attackPower, critHit);
             rival.defence(attackPower);
         }
     }
 
     @Override
     public void defence(int dmg) {
-        this.healthPoint -= dmg;
+        if (this.isDodge()) {
+            System.out.printf("%s увернулся от атаки\n", this.name);
+        } else {
+            this.healthPoint -= dmg;
+        }
     }
 
     @Override
