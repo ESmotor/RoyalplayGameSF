@@ -28,14 +28,17 @@ public class Players implements Fighting {
     private String name;
     private int strength;
     private int agility;
-    private int maxHealth ;
+    private int maxHealth;
     private int healthPoint;
-
     private int gold;
     private int experience;
     private int currentLVL;
     private int newPoints;
     private boolean isAlive;
+
+    public static List<Integer> getLvls() {
+        return lvls;
+    }
     // Геттеры и Сеттеры
 
 
@@ -103,7 +106,7 @@ public class Players implements Fighting {
         this.strength = 5;
         this.agility = 5;
         this.maxHealth = this.strength * 20;
-        this.healthPoint = 70;
+        this.healthPoint = maxHealth;
         this.gold = 1000;
         this.currentLVL = 1;
         this.experience = 1;
@@ -146,7 +149,7 @@ public class Players implements Fighting {
                 System.out.println("Не правильное имя персонажа, попробуйте снова:");
             }
         } while (!wrongSymbols.toString().equals(""));
-        System.out.println("Отлично. Имя вашего персонажа: " + correctName);
+        System.out.println("Отлично. Имя вашего персонажа: " + correctName + "\n");
         newPlayer.name = correctName;
     }
 
@@ -171,9 +174,11 @@ public class Players implements Fighting {
     }
 
     private void checkStats() {
-        if (this.maxHealth < this.strength * 20) {
+        int nowMaxHealth = this.maxHealth;
+        int correctMaxHealth = this.strength * 20;
+        if (nowMaxHealth < correctMaxHealth) {
+            this.healthPoint += (correctMaxHealth - nowMaxHealth);
             this.maxHealth = this.strength * 20;
-            this.healthPoint += (this.strength * 20 - this.maxHealth);
         }
     }
 
@@ -205,28 +210,34 @@ public class Players implements Fighting {
 
     public void distributeAbilities() {
         int enterNumber;
-        System.out.println("Распределите очки");
-        do {
-            System.out.printf("Сила = %d, Ловкость = %d, Доступно очков = %d:\n",
-                    this.getStrength(), this.getAgility(), newPoints);
-            System.out.println("1) Увеличить силу.");
-            System.out.println("2) Увеличить ловкость.");
 
-            enterNumber = enterNum(1, 2);
-            if (enterNumber == 1) {
-                System.out.println("Сила увеличина");
-                this.strength++;
-                newPoints--;
-            } else if (enterNumber == 2) {
-                System.out.println("Ловкость увеличина");
-                this.agility++;
-                newPoints--;
-            }
-        } while (newPoints > 0);
+        if (this.newPoints > 0) {
+            do {
+                System.out.println("\nРаспределите очки");
+                System.out.printf("Сила = %d, Ловкость = %d, Доступно очков = %d:\n",
+                        this.getStrength(), this.getAgility(), this.newPoints);
+                System.out.println("1) Увеличить силу.");
+                System.out.println("2) Увеличить ловкость.");
+
+                enterNumber = enterNum(1, 2);
+                if (enterNumber == 1) {
+                    System.out.println("Сила увеличина\n");
+                    this.strength++;
+                    this.newPoints--;
+                } else if (enterNumber == 2) {
+                    System.out.println("Ловкость увеличина\n");
+                    this.agility++;
+                    this.newPoints--;
+                }
+            } while (this.newPoints > 0);
+            this.checkStats();
+        } else {
+            System.out.println("\nУ вас нет очков для распределения");
+        }
+
         System.out.printf("Сила = %d, Ловкость = %d, Доступно очков = %d:\n",
                 this.getStrength(), this.getAgility(), newPoints);
-        this.newPoints = 0;
-        this.checkStats();
+
     }
 
     private boolean isDodge() {

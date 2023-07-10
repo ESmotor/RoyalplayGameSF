@@ -1,12 +1,12 @@
+import Characters.Arena;
 import Characters.Players;
 
 public class Main {
 
     public static void main(String[] args) {
-        Players player = new Players();
-        System.out.println(player);
-        player.buySomething();
-        System.out.println(player);
+        Arena arena = new Arena();
+        Players player = arena.startMenu();
+        arena.mainMenu();
 
 
 

@@ -47,7 +47,7 @@ public class NpsTraders {
     public String buyedItem() {
         String result = "";
         do {
-            System.out.println("Что хотите купить?");
+            System.out.println("\nЧто хотите купить?");
             this.printStockList();
             int enterNumber = enterNum(1, 4);
             switch (enterNumber) {
