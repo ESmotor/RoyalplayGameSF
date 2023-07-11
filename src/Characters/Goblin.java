@@ -4,18 +4,26 @@ import Characters.Actions.Fighting;
 
 import java.util.Random;
 
-public class Skeleton extends NpcMonsters {
-    //Рассовая особенность скелетов: базовая вероятность увернуться от атаки увеличена на 10%
-    public Skeleton(String name, int monsterLVL) {
+public class Goblin extends NpcMonsters {
+    //Рассовая особенность гоблинов: с вероятностью 10% восле получения урона восстановить
+    //20% максимального запаса здороья
+    public Goblin(String name, int monsterLVL) {
         super(name, monsterLVL);
     }
 
     private boolean isDodge() {
-        double base = 20;
+        double base = 10;
         double dodgeChance = base + this.agility;
         Random rnd = new Random();
         int rndNumber = rnd.nextInt(1000) + 1;
         return (dodgeChance * 10) >= rndNumber;
+    }
+
+    private boolean isRaceAbility() {
+        double abilityChance = 20;
+        Random rnd = new Random();
+        int rndNumber = rnd.nextInt(100) + 1;
+        return abilityChance >= rndNumber;
     }
 
     private boolean isCriticalHit() {
@@ -48,6 +56,10 @@ public class Skeleton extends NpcMonsters {
             System.out.printf("%s увернулся от атаки\n", this.name);
         } else {
             this.healthPoint -= dmg;
+            if (isRaceAbility()) {
+                System.out.printf("Рассовая способность. %s восстановил %d здоровья.\n",this.getName(),this.healthPoint / 5);
+                this.healthPoint = Math.min(this.healthPoint + this.healthPoint / 5,this.maxHealth);
+            }
         }
     }
 
@@ -66,11 +78,6 @@ public class Skeleton extends NpcMonsters {
     }
 
     @Override
-    public int getMonsterLVL() {
-        return this.monsterLVL;
-    }
-
-    @Override
     public int getExperience() {
         return this.experience;
     }
@@ -81,10 +88,14 @@ public class Skeleton extends NpcMonsters {
     }
 
     @Override
+    public int getMonsterLVL() {
+        return this.monsterLVL;
+    }
+
+    @Override
     public String toString() {
         return "Skeleton{" +
                 "name='" + name + '\'' +
-                ", maxHealth=" + maxHealth +
                 ", healthPoint=" + healthPoint +
                 ", strength=" + strength +
                 ", agility=" + agility +

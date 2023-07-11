@@ -277,7 +277,7 @@ public class Players implements Fighting {
         if (this.isDodge()) {
             System.out.printf("%s увернулся от атаки\n", this.name);
         } else {
-            this.healthPoint -= dmg;
+            this.healthPoint -= dmg / 5;
         }
     }
 

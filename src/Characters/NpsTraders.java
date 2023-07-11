@@ -53,15 +53,19 @@ public class NpsTraders {
             switch (enterNumber) {
                 case 1 -> {
                     result = "strength,1,50";
+                    break;
                 }
                 case 2 -> {
                     result = "agility,1,50";
+                    break;
                 }
                 case 3 -> {
                     result = "health,60,60";
+                    break;
                 }
                 case 4 -> {
                     result = "exit,0,0";
+                    break;
                 }
             }
             if (Integer.parseInt(result.split(",")[2]) > buyer.getGold()) {
