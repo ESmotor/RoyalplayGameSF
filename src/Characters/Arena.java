@@ -131,15 +131,15 @@ public class Arena {
             enterNumber = enterNum(1, 4);
             if (enterNumber == 1) {
                 enemylist.remove(0);
-                new Battle(player, enemy1).fight();
+                new Battle(player, enemy1).run();
                 break;
             } else if (enterNumber == 2) {
                 enemylist.remove(1);
-                new Battle(player, enemy2).fight();
+                new Battle(player, enemy2).run();
                 break;
             } else if (enterNumber == 3) {
                 enemylist.remove(2);
-                new Battle(player, enemy3).fight();
+                new Battle(player, enemy3).run();
                 break;
             } else if (enterNumber == 4) {
                 break;

@@ -25,6 +25,8 @@ public class Players implements Fighting {
     private static final int MAX_PlAYERS = 1;
     private static int totalPlayers = 0;
     private static List<Players> playersList = new ArrayList<>();
+    private static final double hard = 0.8;
+    private static final int speed = 3;
     private String name;
     private int strength;
     private int agility;
@@ -263,21 +265,33 @@ public class Players implements Fighting {
     }
 
     @Override
+    public void takeCounterAttack(int dmg) {
+        dmg = (int) (dmg * hard * speed);
+        this.healthPoint -= dmg;
+        System.out.printf("%s получает %d урона от контратаки.(Здоровье:%d/%d)\n"
+                , this.name, dmg, Math.max(0, this.healthPoint), this.maxHealth);
+    }
+
+    @Override
     public void attack(Fighting rival) {
         int attackPower = this.attackPower();
-        String critHit = attackPower > this.strength ? " Критический удар" : "";
+        String critHit = attackPower > this.strength ? " КРИТИЧЕСКИЙ" : "";
         if (this.isAlive) {
-            System.out.printf("%s пытается атаковать противника силой: %d урона%s\n", this.name, attackPower, critHit);
-            rival.defence(attackPower);
+            System.out.printf("\n%s наносит%s удар\n", this.name, critHit);
+            rival.defence(attackPower, this);
         }
     }
 
     @Override
-    public void defence(int dmg) {
+    public void defence(int dmg, Fighting rival) {
+        dmg = (int) (dmg * hard * speed);
         if (this.isDodge()) {
-            System.out.printf("%s увернулся от атаки\n", this.name);
+            System.out.printf("%s увернулся от атаки и проводит контратаку\n", this.name);
+            rival.takeCounterAttack(this.attackPower() / 2);
         } else {
-            this.healthPoint -= dmg / 5;
+            this.healthPoint -= dmg;
+            System.out.printf("%s получает %d урона от атаки.(Здоровье:%d/%d)\n"
+                    , this.name, dmg, Math.max(0, this.healthPoint), this.maxHealth);
         }
     }
 
@@ -285,7 +299,6 @@ public class Players implements Fighting {
     public boolean isAliveNow() {
         if (this.healthPoint <= 0) {
             this.isAlive = false;
-            System.out.printf("Игрок %s героически погиб в битве...\n", this.name);
         }
         return this.healthPoint > 0;
     }
@@ -298,8 +311,8 @@ public class Players implements Fighting {
         int itemPrice;
 
         do {
-            System.out.printf("Сила = %d, Ловкость = %d, Здоровье = %d, Золото = %d:\n",
-                    this.getStrength(), this.getAgility(), this.getHealthPoint(), this.getGold());
+            System.out.printf("Сила = %d, Ловкость = %d, Здоровье = %d/%d, Золото = %d:\n",
+                    this.getStrength(), this.getAgility(), this.getHealthPoint(),this.getMaxHealth(), this.getGold());
             item = shop.buyedItem();
             itemName = item.split(",")[0];
             itemQnt = Integer.parseInt(item.split(",")[1]);

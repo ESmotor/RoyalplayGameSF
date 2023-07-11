@@ -8,6 +8,7 @@ import java.util.Random;
 
 public abstract class NpcMonsters implements Fighting {
     protected static List<NpcMonsters> monstersList = new ArrayList<>();
+    protected static int speed = 3;
     protected String name;
     protected int maxHealth;
     protected int healthPoint;

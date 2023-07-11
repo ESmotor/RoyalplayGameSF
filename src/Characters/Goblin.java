@@ -41,25 +41,39 @@ public class Goblin extends NpcMonsters {
     }
 
     @Override
+    public void takeCounterAttack(int dmg) {
+        dmg = dmg * speed;
+        this.healthPoint -= dmg;
+        System.out.printf("%s получает %d урона от контратаки.(Здоровье:%d/%d)\n"
+                , this.name, dmg, Math.max(0, this.healthPoint), this.maxHealth);
+    }
+
+    @Override
     public void attack(Fighting rival) {
         int attackPower = this.attackPower();
-        String critHit = attackPower > this.strength ? " Критический удар" : "";
+        String critHit = attackPower > this.strength ? " КРИТИЧЕСКИЙ" : "";
         if (this.isAlive) {
-            System.out.printf("%s пытается атаковать противника силой: %d урона%s\n", this.name, attackPower, critHit);
-            rival.defence(attackPower);
+            System.out.printf("\n%s наносит%s удар\n", this.name, critHit);
+            rival.defence(attackPower, this);
         }
     }
 
     @Override
-    public void defence(int dmg) {
+    public void defence(int dmg, Fighting rival) {
+        dmg = dmg * speed;
         if (this.isDodge()) {
-            System.out.printf("%s увернулся от атаки\n", this.name);
+            System.out.printf("%s увернулся от атаки и проводит контратаку\n", this.name);
+            rival.takeCounterAttack(this.attackPower() / 2);
         } else {
             this.healthPoint -= dmg;
-            if (isRaceAbility()) {
-                System.out.printf("Рассовая способность. %s восстановил %d здоровья.\n",this.getName(),this.healthPoint / 5);
-                this.healthPoint = Math.min(this.healthPoint + this.healthPoint / 5,this.maxHealth);
+            System.out.printf("%s получает %d урона от атаки.(Здоровье:%d/%d)\n"
+                    , this.name, dmg, Math.max(0, this.healthPoint), this.maxHealth);
+            if (this.isAliveNow() && isRaceAbility()) {
+                this.healthPoint = Math.min(this.healthPoint + this.maxHealth / 5, this.maxHealth);
+                System.out.printf("Рассовая способность. %s восстановил %d здоровья.(Здоровье:%d/%d)\n"
+                        , this.getName(), this.maxHealth / 5, Math.max(0, this.healthPoint), this.maxHealth);
             }
+
         }
     }
 
@@ -67,7 +81,6 @@ public class Goblin extends NpcMonsters {
     public boolean isAliveNow() {
         if (this.healthPoint <= 0) {
             this.isAlive = false;
-            System.out.printf("Монстр %s повержен!\n", this.name);
         }
         return this.healthPoint > 0;
     }
